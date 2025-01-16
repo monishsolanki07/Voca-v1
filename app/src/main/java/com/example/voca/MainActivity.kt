@@ -5,7 +5,8 @@ package com.example.voca
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.example.voca.ui.theme.RegisterScreen
+import com.example.voca.navigation.AppNavigation
+//import com.example.voca.ui.theme.RegisterScreen
 import com.example.voca.viewmodel.RegisterViewModel
 
 class MainActivity : ComponentActivity() {
@@ -13,7 +14,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val viewModel = RegisterViewModel() // Initialize ViewModel
         setContent {
-            RegisterScreen(viewModel) // Load RegisterScreen
+            AppNavigation(viewModel = viewModel) // Load RegisterScreen
         }
     }
 }

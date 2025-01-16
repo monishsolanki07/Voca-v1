@@ -32,18 +32,18 @@ class RegisterViewModel : ViewModel() {
             .client(client)  // Attach the custom OkHttpClient to Retrofit
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-
         apiService = retrofit.create(ApiService::class.java)
     }
 
     // Update method to accept RegisterRequest instead of User
-    fun registerUser(request: RegisterRequest, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
+    fun registerUser(request: RegisterRequest, onSuccess: () -> Unit, onError: (String) -> Unit) {
         apiService.registerUser(request).enqueue(object : Callback<RegisterResponse> {
             override fun onResponse(call: Call<RegisterResponse>, response: Response<RegisterResponse>) {
                 if (response.isSuccessful) {
-                    // Handle successful response
-                    response.body()?.uniqueKey?.let {
-                        onSuccess("Registration successful: $it")
+                    response.body()?.let {
+                        // Log the success message
+                        android.util.Log.d("RegisterViewModel", "Registration successful")
+                        onSuccess() // Trigger success callback to indicate success
                     } ?: onError("Empty response body")
                 } else {
                     onError("Registration failed: ${response.message()}")
@@ -55,4 +55,5 @@ class RegisterViewModel : ViewModel() {
             }
         })
     }
+
 }

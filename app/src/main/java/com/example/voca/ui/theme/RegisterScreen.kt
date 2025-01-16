@@ -1,5 +1,4 @@
-package com.example.voca.ui.theme
-
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -7,18 +6,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.voca.network.User
+import androidx.navigation.NavController
 import com.example.voca.network.RegisterRequest
+import com.example.voca.network.User
 import com.example.voca.viewmodel.RegisterViewModel
 
 @Composable
-fun RegisterScreen(viewModel: RegisterViewModel) {
+fun RegisterScreen(viewModel: RegisterViewModel, navController: NavController) {
     var username by remember { mutableStateOf("") }
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var result by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -66,7 +65,6 @@ fun RegisterScreen(viewModel: RegisterViewModel) {
 
         Button(
             onClick = {
-                // Create User object
                 val user = User(
                     username = username,
                     firstName = firstName,
@@ -74,22 +72,24 @@ fun RegisterScreen(viewModel: RegisterViewModel) {
                     email = email,
                     password = password
                 )
-
-                // Wrap the User object inside the "data" key as a List
                 val registerRequest = RegisterRequest(data = listOf(user))
 
-                // Call the registerUser method
                 viewModel.registerUser(registerRequest,
-                    onSuccess = { result = "Registration successful: $it" },
-                    onError = { result = it }
+                    onSuccess = {
+                        // Navigate to Home Screen
+                        navController.navigate("home") {
+                            popUpTo("register") { inclusive = true } // Remove Register Screen from back stack
+                        }
+                    },
+                    onError = { error ->
+                        // Show error using a Toast
+                        Toast.makeText(navController.context, error, Toast.LENGTH_SHORT).show()
+                    }
                 )
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Register")
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(result, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.body1)
     }
 }
