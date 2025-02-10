@@ -5,6 +5,7 @@ plugins {
     id("kotlin-kapt")
 }
 
+
 android {
     namespace = "com.example.voca"
     compileSdk = 35
@@ -118,6 +119,28 @@ dependencies {
     kapt ("androidx.room:room-compiler:2.5.2")
 
     implementation ("androidx.navigation:navigation-compose:2.7.3")
+
+
+    val camerax_version = "1.3.0"
+
+    implementation ("androidx.camera:camera-core:$camerax_version")
+    implementation ("androidx.camera:camera-camera2:$camerax_version")
+    implementation ("androidx.camera:camera-lifecycle:$camerax_version")
+    implementation ("androidx.camera:camera-video:$camerax_version")
+    implementation ("androidx.camera:camera-view:$camerax_version")
+    implementation ("androidx.camera:camera-extensions:$camerax_version")
+    implementation ("androidx.camera:camera-core:1.5.0-alpha01")
+    implementation ("androidx.camera:camera-lifecycle:1.5.0-alpha01")
+    implementation ("androidx.camera:camera-video:1.5.0-alpha01")
+    implementation ("androidx.camera:camera-view:1.5.0-alpha01")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+
+
+    implementation ("androidx.security:security-crypto:1.0.0")
+
+    implementation ("com.google.accompanist:accompanist-pager:0.23.1")
+    implementation ("com.google.accompanist:accompanist-pager-indicators:0.23.1")
+    implementation ("androidx.compose.animation:animation:1.4.0")
 
 
 

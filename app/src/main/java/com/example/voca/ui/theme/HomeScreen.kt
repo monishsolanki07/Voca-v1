@@ -1,234 +1,391 @@
 package com.example.voca.ui.theme
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.*
+import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.*
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.graphics.vector.ImageVector
 
-//val Purple40 = Color(0xFF6650a4)
-//val Purple80 = Color(0xFFD0BCFF)
-//val PurpleGrey40 = Color(0xFF625b71)
-val PurpleLighter = Color(0xFFF0E6FF)
 
+import com.example.voca.R
+
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun HomeScreen() {
-    // Animation states
-    val cardScale = remember { Animatable(0.8f) }
-    LaunchedEffect(Unit) {
-        cardScale.animateTo(
-            targetValue = 1f,
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessLow
-            )
-        )
-    }
+fun HomeScreen(navController: NavController) {
+    var selectedItem by remember { mutableStateOf(0) }
+    val items = listOf("Home", "Profile", "Activity", "Quiz")
+    val icons = listOf(
+        Icons.Filled.Home,
+        Icons.Filled.Person,
+        Icons.Filled.FitnessCenter,
+        Icons.Filled.QuestionAnswer
+    )
+    val bottomNavHeight = 56.dp
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                backgroundColor = Purple40,
+                title = { Text("Voca", fontWeight = FontWeight.Bold) },
+                backgroundColor = Color(0xFF9C7FE4),
                 contentColor = Color.White,
-                elevation = 8.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Voca",
-                        style = MaterialTheme.typography.h6.copy(
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                    Card(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape),
-                        border = BorderStroke(2.dp, Purple80),
-                        backgroundColor = PurpleGrey40
-                    ) {
+                elevation = 8.dp,
+                actions = {
+                    IconButton(onClick = { navController.navigate("profile") }) {
                         Icon(
-                            Icons.Filled.Person,
+                            imageVector = Icons.Filled.Person,
                             contentDescription = "Profile",
-                            tint = Color.White,
-                            modifier = Modifier.padding(8.dp)
+                            tint = Color.White
                         )
                     }
                 }
-            }
+            )
         },
         bottomBar = {
             BottomNavigation(
-                backgroundColor = Purple40,
-                elevation = 8.dp
+                backgroundColor = Color(0xFF9C7FE4),
+                contentColor = Color.White
             ) {
-                BottomNavigationItem(
-                    icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
-                    selected = true,
-                    onClick = { /* Handle Home click */ },
-                    label = { Text("Home") },
-                    selectedContentColor = Color.White,
-                    unselectedContentColor = Color.White.copy(alpha = 0.7f)
+                items.forEachIndexed { index, item ->
+                    BottomNavigationItem(
+                        selected = selectedItem == index,
+                        onClick = {
+                            selectedItem = index
+                            when (index) {
+                                1 -> navController.navigate("profile")
+                                // Add other navigation logic if required
+                            }
+                        },
+                        icon = { Icon(imageVector = icons[index], contentDescription = item) },
+                        label = {
+                            Text(
+                                text = item,
+                                style = MaterialTheme.typography.body2.copy(color = Color.White)
+                            )
+                        },
+                        selectedContentColor = Color(0xFFD1A4E8),
+                        unselectedContentColor = Color.White.copy(alpha = 0.6f)
+                    )
+                }
+            }
+        }
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState())
+                    .padding(bottom = bottomNavHeight)
+            ) {
+                // Image Section
+                DisplayImageSection()
+
+                // Word of the Day Banner
+                WordOfTheDayBanner(navController)
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Speech Tips Section
+                SpeechTipsSection()
+
+                // Path Activity Section
+                PathActivity(navController)
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Contact Us Section
+                ContactUsSection()
+            }
+        }
+    }
+}
+
+/**
+ * Displays an image with a border and padding.
+ */
+@Composable
+fun DisplayImageSection() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
+            .border(2.dp, Color.Gray, RoundedCornerShape(8.dp))
+            .padding(16.dp)
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.a1),
+            contentDescription = "Image placeholder",
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+
+/**
+ * Displays the Word of the Day banner, which is clickable and navigates to a different screen.
+ */
+@Composable
+fun WordOfTheDayBanner(navController: NavController) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)
+            .padding(vertical = 20.dp)
+            .clickable { navController.navigate("word_of_the_day") },
+        elevation = 10.dp,
+        shape = RoundedCornerShape(24.dp),
+        backgroundColor = Color(0xFFD1C4E9)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Filled.AutoStories,
+                contentDescription = "Word of the Day Icon",
+                tint = Color(0xFF7E57C2),
+                modifier = Modifier.size(80.dp)
+            )
+            Spacer(modifier = Modifier.width(20.dp))
+            Column {
+                Text(
+                    text = "Discover the Word of the Day!",
+                    style = MaterialTheme.typography.h5.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF6A1B9A)
+                    )
                 )
-                BottomNavigationItem(
-                    icon = { Icon(Icons.Filled.Search, contentDescription = "Search") },
-                    selected = false,
-                    onClick = { /* Handle Search click */ },
-                    label = { Text("Search") },
-                    selectedContentColor = Color.White,
-                    unselectedContentColor = Color.White.copy(alpha = 0.7f)
-                )
-                BottomNavigationItem(
-                    icon = { Icon(Icons.Filled.Notifications, contentDescription = "Notifications") },
-                    selected = false,
-                    onClick = { /* Handle Notifications click */ },
-                    label = { Text("Notifications") },
-                    selectedContentColor = Color.White,
-                    unselectedContentColor = Color.White.copy(alpha = 0.7f)
-                )
-                BottomNavigationItem(
-                    icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
-                    selected = false,
-                    onClick = { /* Handle Profile click */ },
-                    label = { Text("Profile") },
-                    selectedContentColor = Color.White,
-                    unselectedContentColor = Color.White.copy(alpha = 0.7f)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Tap to reveal the word and its meaning.",
+                    style = MaterialTheme.typography.body1.copy(
+                        color = Color.Gray,
+                        fontWeight = FontWeight.Medium
+                    )
                 )
             }
         }
-    ) { paddingValues ->
-        Column(
+    }
+}
+
+/**
+ * Displays speech tips in a list format with cards for each tip.
+ */
+@Composable
+fun SpeechTipsSection() {
+    Column(modifier = Modifier.padding(top = 16.dp)) {
+        Text(
+            "Speech Tips",
+            style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.Bold),
+            modifier = Modifier.padding(bottom = 12.dp)
+        )
+
+        SpeechTipCard(
+            icon = Icons.Filled.Mic,
+            title = "1. Speak Clearly",
+            description = "Ensure your words are articulated properly and not rushed."
+        )
+
+        SpeechTipCard(
+            icon = Icons.Filled.Accessibility,
+            title = "2. Practice Breathing",
+            description = "Control your speech with regular and proper breathing for better delivery."
+        )
+
+        SpeechTipCard(
+            icon = Icons.Filled.Pause,
+            title = "3. Use Pauses Effectively",
+            description = "Pauses can help convey meaning and allow the listener to absorb the message."
+        )
+    }
+}
+
+/**
+ * Displays an individual speech tip in a card format.
+ */
+@Composable
+fun SpeechTipCard(icon: ImageVector, title: String, description: String) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+        elevation = 4.dp,
+        backgroundColor = Color(0xFFEDE7F6)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                tint = Color(0xFF9C7FE4),
+                modifier = Modifier.size(28.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(
+                    title,
+                    style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Bold)
+                )
+                Text(
+                    description,
+                    style = MaterialTheme.typography.body2
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Displays the Path Activity banner, which is clickable and navigates to a different screen.
+ */
+@Composable
+fun PathActivity(navController: NavController) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(170.dp)
+            .padding(vertical = 20.dp)
+            .clickable { navController.navigate("path_activity") },
+        elevation = 10.dp,
+        shape = RoundedCornerShape(24.dp),
+        backgroundColor = Color(0xFFD1C4E9)
+    ) {
+        Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Welcome Card with Animation
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .scale(cardScale.value),
-                elevation = 8.dp,
-                shape = RoundedCornerShape(20.dp),
-                border = BorderStroke(2.dp, Purple40)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .background(PurpleLighter)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(20.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "Welcome to Voca!",
-                            style = MaterialTheme.typography.h4.copy(
-                                color = Purple40,
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "Your personal vocabulary assistant",
-                            style = MaterialTheme.typography.subtitle1,
-                            color = PurpleGrey40
-                        )
-                    }
-                }
+            Icon(
+                imageVector = Icons.Filled.FitnessCenter,
+                contentDescription = "Activity",
+                tint = Color(0xFF7E57C2),
+                modifier = Modifier.size(70.dp)
+            )
+            Spacer(modifier = Modifier.width(20.dp))
+            Column {
+                Text(
+                    text = "Discover the World of Learning!",
+                    style = MaterialTheme.typography.h6.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF6A1B9A)
+                    )
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Tap to reveal the Path",
+                    style = MaterialTheme.typography.body1.copy(
+                        color = Color.Gray,
+                        fontWeight = FontWeight.Medium
+                    )
+                )
             }
+        }
+    }
+}
 
-            // Feature Cards
-            FeatureCard(
-                icon = Icons.Filled.Book,
-                title = "Daily Vocabulary",
-                description = "Learn 5 new words every day"
+/**
+ * Displays the Contact Us section with email, phone, website, and social media details.
+ */
+@Composable
+fun ContactUsSection() {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp),
+        elevation = 4.dp,
+        shape = RoundedCornerShape(12.dp),
+        backgroundColor = Color(0xFFF3E5F5)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "Contact Us",
+                style = MaterialTheme.typography.h6.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF6A1B9A)
+                ),
+                modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            FeatureCard(
-                icon = Icons.Filled.Quiz,
-                title = "Practice Quiz",
-                description = "Test your knowledge with interactive quizzes"
+            // Add multiple contact options
+            ContactRow(
+                icon = Icons.Filled.Email,
+                title = "Email Us",
+                details = "contact@vocaapp.com"
             )
-
-            FeatureCard(
-                icon = Icons.Filled.Bookmark,
-                title = "Saved Words",
-                description = "Review your saved vocabulary"
+            ContactRow(
+                icon = Icons.Filled.Phone,
+                title = "Call Us",
+                details = "+1 234 567 890"
             )
-
-            FeatureCard(
-                icon = Icons.Filled.TrendingUp,
-                title = "Progress Tracker",
-                description = "Monitor your learning journey"
+            ContactRow(
+                icon = Icons.Filled.Language,
+                title = "Visit Our Website",
+                details = "www.vocaapp.com"
+            )
+            ContactRow(
+                icon = Icons.Filled.Share,
+                title = "Follow Us",
+                details = "@VocaApp on all platforms"
             )
         }
     }
 }
 
+/**
+ * Displays a single contact row with an icon, title, and details.
+ */
 @Composable
-fun FeatureCard(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    title: String,
-    description: String
-) {
-    Card(
+fun ContactRow(icon: ImageVector, title: String, details: String) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable { /* Handle click */ },
-        elevation = 4.dp,
-        backgroundColor = MaterialTheme.colors.surface,
-        shape = RoundedCornerShape(16.dp)
+            .padding(bottom = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = Purple40,
-                modifier = Modifier
-                    .size(48.dp)
-                    .padding(end = 16.dp)
+        Icon(
+            imageVector = icon,
+            contentDescription = title,
+            tint = Color(0xFF8E24AA),
+            modifier = Modifier.size(28.dp)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Column {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.subtitle1.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF6A1B9A)
+                )
             )
-            Column {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.h6.copy(
-                        color = Purple40,
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.body2,
-                    color = PurpleGrey40
-                )
-            }
+            Text(
+                text = details,
+                style = MaterialTheme.typography.body2.copy(color = Color.DarkGray)
+            )
         }
     }
 }
@@ -236,7 +393,9 @@ fun FeatureCard(
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    MaterialTheme {
-        HomeScreen()
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "home") {
+        composable("home") { HomeScreen(navController = navController) }
+        composable("profile") { ProfileScreen() } // ProfileScreen from ProfileScreen.kt
     }
 }
