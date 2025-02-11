@@ -69,6 +69,7 @@ fun HomeScreen(navController: NavController) {
                             selectedItem = index
                             when (index) {
                                 1 -> navController.navigate("profile")
+                                2 -> navController.navigate("camera_activity")
                                 // Add other navigation logic if required
                             }
                         },

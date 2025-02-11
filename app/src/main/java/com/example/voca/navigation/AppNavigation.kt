@@ -1,11 +1,15 @@
 package com.example.voca.navigation
 
+import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.voca.ui.RegisterScreen
+import com.example.voca.ui.theme.CameraActivity
 import com.example.voca.viewmodel.RegisterViewModel
 import com.example.voca.ui.theme.HomeScreen
 import com.example.voca.ui.theme.PathActivity
@@ -36,5 +40,15 @@ fun AppNavigation(viewModel: RegisterViewModel) {
         composable("path_activity") {
             PathActivity() // Navigate to Word Of The Day
         }
+        composable("camera_activity") {
+            val context = LocalContext.current // ✅ Get context inside the composable
+
+            // 🔥 Start CameraActivity using Intent
+            LaunchedEffect(Unit) {
+                val intent = Intent(context, CameraActivity::class.java)
+                context.startActivity(intent)
+            }
+        }
+
     }
 }
