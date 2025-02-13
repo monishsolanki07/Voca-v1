@@ -70,6 +70,7 @@ fun HomeScreen(navController: NavController) {
                             when (index) {
                                 1 -> navController.navigate("profile")
                                 2 -> navController.navigate("camera_activity")
+                                3 -> navController.navigate("activity_list")
                                 // Add other navigation logic if required
                             }
                         },

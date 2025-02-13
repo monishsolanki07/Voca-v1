@@ -9,6 +9,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.voca.ui.RegisterScreen
+import com.example.voca.ui.theme.ActivityItem
+import com.example.voca.ui.theme.ActivityListActivity
 import com.example.voca.ui.theme.CameraActivity
 import com.example.voca.viewmodel.RegisterViewModel
 import com.example.voca.ui.theme.HomeScreen
@@ -46,6 +48,15 @@ fun AppNavigation(viewModel: RegisterViewModel) {
             // 🔥 Start CameraActivity using Intent
             LaunchedEffect(Unit) {
                 val intent = Intent(context, CameraActivity::class.java)
+                context.startActivity(intent)
+            }
+        }
+        composable("activity_list") {
+            val context = LocalContext.current // ✅ Get context inside the composable
+
+            // 🔥 Start CameraActivity using Intent
+            LaunchedEffect(Unit) {
+                val intent = Intent(context, ActivityListActivity::class.java)
                 context.startActivity(intent)
             }
         }
