@@ -2,6 +2,7 @@ package com.example.voca.ui.theme
 
 import android.Manifest
 import android.content.ContentValues
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.MediaStore
@@ -32,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
@@ -98,6 +100,8 @@ fun CameraScreen(topicName: String, keywords: String) {
     var isPaused by remember { mutableStateOf(false) }
     var timerText by remember { mutableStateOf("00:00") }
     var seconds by remember { mutableStateOf(0) }
+    var cacheFile by remember { mutableStateOf<File?>(null) }
+
 
     fun hasPermissions(): Boolean {
         return ContextCompat.checkSelfPermission(
@@ -192,29 +196,37 @@ fun CameraScreen(topicName: String, keywords: String) {
                         isPaused = false
                         seconds = 0
                         timerText = "00:00"
+
+                        // Ensure cacheFile is not null before proceeding
+                        cacheFile?.let {
+                            val intent = Intent(context, PreviewActivity::class.java).apply {
+                                putExtra("VIDEO_PATH", it.absolutePath) // Pass video path
+                                putExtra("TOPIC_NAME", topicName) // Pass topic name
+                            }
+                            context.startActivity(intent)
+                        }
                     } else {
                         if (!hasPermissions()) return@BottomSection
 
-                        val contentValues = ContentValues().apply {
-                            put(MediaStore.Video.Media.DISPLAY_NAME,
-                                "VID_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())}.mp4")
-                        }
-
-                        val mediaStoreOutput = MediaStoreOutputOptions.Builder(
-                            context.contentResolver,
-                            MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                        // Define the cache file location
+                        cacheFile = File(
+                            context.cacheDir,
+                            "VID_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())}.mp4"
                         )
-                            .setContentValues(contentValues)
-                            .build()
+
+                        val fileOutputOptions = FileOutputOptions.Builder(cacheFile!!).build()
 
                         recording = videoCapture?.output
-                            ?.prepareRecording(context, mediaStoreOutput)
+                            ?.prepareRecording(context, fileOutputOptions)
                             ?.apply { withAudioEnabled() }
                             ?.start(ContextCompat.getMainExecutor(context)) {}
 
                         isRecording = true
                     }
-                },
+                }
+
+
+                ,
                 onPauseResumeClick = {
                     if (isRecording) {
                         if (!isPaused) {

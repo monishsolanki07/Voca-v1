@@ -45,6 +45,9 @@
         <activity android:name=".ui.theme.ActivityListActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <activity android:name=".ui.theme.PreviewActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
 
     </application>
 

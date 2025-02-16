@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "606410538566",
+    "project_id": "voca-136b1",
+    "storage_bucket": "voca-136b1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:606410538566:android:0db18a4fca49a3d68e5447",
+        "android_client_info": {
+          "package_name": "com.example.voca"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAc836nlFX75PkcsMv_6KFP-Zd2FgxSFqY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
