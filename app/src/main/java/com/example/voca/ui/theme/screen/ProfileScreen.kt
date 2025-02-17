@@ -1,4 +1,5 @@
-package com.example.voca.ui.theme
+package com.example.voca.ui.theme.screen
+
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas

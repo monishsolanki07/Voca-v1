@@ -1,5 +1,6 @@
-package com.example.voca.ui.theme
+package com.example.voca.ui.theme.screen
 
+import com.example.voca.ui.theme.screen.ProfileScreen
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -22,6 +23,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.*
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.voca.activities.ActivityItem
+import com.example.voca.activities.ActivityListActivity
 
 
 import com.example.voca.R

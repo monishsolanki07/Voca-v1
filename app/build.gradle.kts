@@ -156,6 +156,9 @@ dependencies {
     implementation ("androidx.camera:camera-view:1.0.0")
     implementation ("androidx.camera:camera-video:1.0.0")
 
+    implementation ("com.google.firebase:firebase-storage:20.3.0")
+    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
+    implementation("com.google.firebase:firebase-storage")
 
 
 

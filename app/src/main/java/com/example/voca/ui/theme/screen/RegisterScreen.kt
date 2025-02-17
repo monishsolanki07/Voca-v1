@@ -1,4 +1,5 @@
-package com.example.voca.ui
+package com.example.voca.ui.theme.screen
+
 
 import android.os.Build
 import android.util.Log

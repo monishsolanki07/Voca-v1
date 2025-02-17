@@ -1,5 +1,9 @@
-package com.example.voca.ui.theme
+package com.example.voca.activities
 
+import com.example.voca.ui.theme.VocaTheme
+
+
+import com.example.voca.activities.CameraActivity
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle

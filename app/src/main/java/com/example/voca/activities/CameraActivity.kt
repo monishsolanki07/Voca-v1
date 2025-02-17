@@ -1,4 +1,6 @@
-package com.example.voca.ui.theme
+package com.example.voca.activities
+
+
 
 import android.Manifest
 import android.content.ContentValues
@@ -33,6 +35,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import com.example.voca.activities.PreviewActivity
+import com.example.voca.ui.theme.VocaTheme
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*

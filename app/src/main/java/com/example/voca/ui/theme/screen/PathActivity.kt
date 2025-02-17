@@ -1,4 +1,4 @@
-package com.example.voca.ui.theme
+package com.example.voca.ui.theme.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

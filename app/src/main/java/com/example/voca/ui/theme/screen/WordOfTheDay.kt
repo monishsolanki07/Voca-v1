@@ -1,4 +1,5 @@
-package com.example.voca.ui.theme
+package com.example.voca.ui.theme.screen
+
 
 import android.media.MediaPlayer
 import android.net.Uri
