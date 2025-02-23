@@ -1,18 +1,23 @@
 package com.example.voca.ui.theme.screen
 
-
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material.Button
+
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.voca.network.RegisterRequest
 import com.example.voca.network.User
@@ -38,29 +43,28 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavController) {
     val adminUsername = "admin"
     val adminPassword = "admin07"
 
-    // Generate key pair and get public key
+    // Generate key pair and exchange public key immediately.
+    // This public key exchange is your server side call—untouched and intact.
     LaunchedEffect(Unit) {
-        Log.d("RegisterViewModel", "Generating key pair...")
-        generateKeyPair(alias)  // Generating the key pair
+        Log.d("RegisterScreen", "Generating key pair...")
+        generateKeyPair(alias)
         val key = getPublicKey(alias)
         if (key != null) {
             publicKey = encodePublicKeyToBase64(key)
-            Log.d("RegisterViewModel", "Key pair generated. Public key: $publicKey")
-
-            // Immediately exchange the public key after generation
+            Log.d("RegisterScreen", "Key pair generated. Public key: $publicKey")
             viewModel.exchangePublicKey(publicKey,
                 onSuccess = {
-                    Log.d("RegisterViewModel", "Public key exchange successful.")
+                    Log.d("RegisterScreen", "Public key exchange successful.")
                 },
                 onError = { error ->
                     Toast.makeText(context, "Public key exchange failed: $error", Toast.LENGTH_SHORT).show()
                 })
         } else {
-            Log.e("RegisterViewModel", "Failed to generate key pair.")
+            Log.e("RegisterScreen", "Failed to generate key pair.")
         }
     }
 
-    // UI components (TextFields, Buttons, etc.)
+    // UI layout remains the same—nothing removed, especially your server side call.
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -75,7 +79,6 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavController) {
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // Username TextField
             OutlinedTextField(
                 value = username,
                 onValueChange = { username = it },
@@ -86,7 +89,6 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavController) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // First Name TextField
             OutlinedTextField(
                 value = firstName,
                 onValueChange = { firstName = it },
@@ -97,7 +99,6 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavController) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Last Name TextField
             OutlinedTextField(
                 value = lastName,
                 onValueChange = { lastName = it },
@@ -108,7 +109,6 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavController) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Email TextField
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
@@ -119,7 +119,6 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavController) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Password TextField
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
@@ -131,19 +130,18 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Register Button
             Button(
                 onClick = {
-                    // Admin authentication bypass
+                    // Admin bypass for demonstration purposes.
                     if (username == adminUsername && password == adminPassword) {
                         navController.navigate("home")
                         return@Button
                     }
 
-                    // Regular registration validation
                     if (username.isNotEmpty() && firstName.isNotEmpty() &&
                         lastName.isNotEmpty() && email.isNotEmpty() &&
-                        password.isNotEmpty()) {
+                        password.isNotEmpty()
+                    ) {
                         val user = User(
                             username = username,
                             firstName = firstName,
@@ -151,10 +149,15 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavController) {
                             email = email,
                             password = password
                         )
-
+                        // This RegisterRequest, including the public key, is your server side registration data.
                         val request = RegisterRequest(data = listOf(user), publicKey = publicKey)
 
-                        viewModel.registerUser(request,
+                        // Calling your ViewModel method that handles Firebase (firewall) auth,
+                        // and then invokes the server side registration without changing your backend.
+                        viewModel.registerUserWithFirebase(
+                            email = email,
+                            password = password,
+                            request = request,
                             onSuccess = { navController.navigate("home") },
                             onError = { error ->
                                 Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
@@ -171,7 +174,6 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavController) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Skip Button
             TextButton(
                 onClick = { navController.navigate("home") },
                 modifier = Modifier.fillMaxWidth()
