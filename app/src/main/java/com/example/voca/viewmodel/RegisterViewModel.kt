@@ -62,24 +62,35 @@ class RegisterViewModel : ViewModel() {
     }
 
     // Updated: Register user with Firebase (firewall) authentication using coroutines
-    fun registerUserWithFirebase(email: String, password: String, request: RegisterRequest, onSuccess: () -> Unit, onError: (String) -> Unit) {
-        viewModelScope.launch {
-            try {
-                val firebaseResult = registerWithFirebase(email, password)
-                if (firebaseResult) {
+    fun registerUserWithFirebase(
+        email: String,
+        password: String,
+        request: RegisterRequest,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
                     Log.d("RegisterViewModel", "Firebase registration successful")
-                    // Proceed with server-side registration (untouched as requested)
-                    registerUser(request, onSuccess, onError)
+                    // Immediately navigate since Firebase accepted the user.
+                    onSuccess()
+                    // Now perform the server-side registration separately.
+                    registerUser(request,
+                        onSuccess = {
+                            Log.d("RegisterViewModel", "Server-side registration completed (asynchronous)")
+                        },
+                        onError = { error ->
+                            Log.e("RegisterViewModel", "Server-side registration error: $error")
+                        }
+                    )
                 } else {
-                    Log.e("RegisterViewModel", "Firebase registration failed")
-                    onError("Firebase registration failed")
+                    Log.e("RegisterViewModel", "Firebase registration failed: ${task.exception?.message}")
+                    onError("Firebase registration failed: ${task.exception?.message}")
                 }
-            } catch (e: Exception) {
-                Log.e("RegisterViewModel", "Firebase registration exception: ${e.message}")
-                onError("Firebase registration exception: ${e.message}")
             }
-        }
     }
+
 
     // Suspend function for Firebase registration using suspendCancellableCoroutine
     private suspend fun registerWithFirebase(email: String, password: String): Boolean =
@@ -109,4 +120,23 @@ class RegisterViewModel : ViewModel() {
             }
         })
     }
+
+    fun signInUserWithFirebase(
+        email: String,
+        password: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("RegisterViewModel", "Firebase sign-in successful")
+                    onSuccess()
+                } else {
+                    Log.e("RegisterViewModel", "Firebase sign-in failed: ${task.exception?.message}")
+                    onError("Firebase sign-in failed: ${task.exception?.message}")
+                }
+            }
+    }
+
 }

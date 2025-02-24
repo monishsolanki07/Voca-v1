@@ -10,13 +10,11 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.Button
-
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.voca.network.RegisterRequest
@@ -152,7 +150,7 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavController) {
                         // This RegisterRequest, including the public key, is your server side registration data.
                         val request = RegisterRequest(data = listOf(user), publicKey = publicKey)
 
-                        // Calling your ViewModel method that handles Firebase (firewall) auth,
+                        // Calling your ViewModel method that handles Firebase auth,
                         // and then invokes the server side registration without changing your backend.
                         viewModel.registerUserWithFirebase(
                             email = email,
@@ -170,6 +168,16 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavController) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Register")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // New button to navigate to the Sign In screen.
+            TextButton(
+                onClick = { navController.navigate("signin") },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Already have an account? Sign In")
             }
 
             Spacer(modifier = Modifier.height(8.dp))

@@ -17,6 +17,7 @@ import com.example.voca.ui.theme.screen.HomeScreen
 import com.example.voca.ui.theme.screen.PathActivity
 import com.example.voca.ui.theme.screen.ProfileScreen
 import com.example.voca.ui.theme.screen.WordOfTheDayScreen
+import com.example.voca.ui.theme.screen.SignInScreen
 import com.google.firebase.auth.FirebaseAuth
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -32,6 +33,11 @@ fun AppNavigation(viewModel: RegisterViewModel) {
         composable("register") {
             RegisterScreen(viewModel = viewModel, navController = navController)
         }
+        // Signin screen
+        composable("signin") {
+            SignInScreen(viewModel = viewModel, navController = navController)
+        }
+
         // Home Screen
         composable("home") {
             HomeScreen(navController = navController)
