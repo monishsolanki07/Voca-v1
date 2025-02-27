@@ -37,11 +37,25 @@ data class PublicKeyExchangeResponse(
     val message: String
 )
 
+// New data classes for video upload via firewall
+data class VideoUploadRequest(
+    val fileName: String,
+    val videoUrl: String
+)
+
+data class VideoUploadResponse(
+    val downloadUrl: String
+)
+
 // Retrofit interface for the API
 interface ApiService {
-    @POST("register")  // No trailing slash here!
+    @POST("register")
     fun registerUser(@Body request: RegisterRequest): Call<RegisterResponse>
 
-    @POST("exchange-public-key") // Public key exchange endpoint
+    @POST("exchange-public-key")
     fun exchangePublicKey(@Body request: PublicKeyExchangeRequest): Call<PublicKeyExchangeResponse>
+
+    // New endpoint for sending the video URL to the firewall
+    @POST("uploadVideo")
+    fun uploadVideo(@Body request: VideoUploadRequest): Call<VideoUploadResponse>
 }

@@ -1,6 +1,6 @@
 package com.example.voca.ui.theme.screen
 
-
+import android.content.Context
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -23,10 +23,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.voca.R
 
 @Composable
@@ -87,6 +87,11 @@ fun UserProfileHeader(
     primaryColor: Color,
     secondaryColor: Color
 ) {
+    // Retrieve stored username; default to "Admin" if not found.
+    val context = LocalContext.current
+    val sharedPref = context.getSharedPreferences("user_data", Context.MODE_PRIVATE)
+    val storedUsername = sharedPref.getString("username", "Admin")
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -114,8 +119,9 @@ fun UserProfileHeader(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Use the stored username instead of the hardcoded "Admin".
             Text(
-                text = "Admin",
+                text = storedUsername ?: "Admin",
                 color = Color.White,
                 style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.Bold)
             )
@@ -133,6 +139,11 @@ fun PerformanceMetrics(
     primaryColor: Color,
     secondaryColor: Color
 ) {
+    // State variables for performance metrics, initially set to zero.
+    var studyHours by remember { mutableStateOf(0) }
+    var completion by remember { mutableStateOf(0) }  // Percentage (0%)
+    var dayStreak by remember { mutableStateOf(0) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -158,19 +169,19 @@ fun PerformanceMetrics(
             ) {
                 PerformanceItem(
                     icon = Icons.Default.AccessTime,
-                    value = "14",
+                    value = studyHours.toString(),
                     label = "Study Hours",
                     color = primaryColor
                 )
                 PerformanceItem(
                     icon = Icons.Default.CheckCircle,
-                    value = "55%",
+                    value = "$completion%",
                     label = "Completion",
                     color = primaryColor
                 )
                 PerformanceItem(
                     icon = Icons.Default.Star,
-                    value = "30",
+                    value = dayStreak.toString(),
                     label = "Day Streak",
                     color = primaryColor
                 )
@@ -211,7 +222,8 @@ fun PerformanceItem(
 
 @Composable
 fun SkillProgressSection(primaryColor: Color) {
-    var progress by remember { mutableStateOf(0.75f) }
+    // Skill progress initially set to 0%.
+    var progress by remember { mutableStateOf(0.0f) }
     val animatedProgress by animateFloatAsState(targetValue = progress)
 
     Card(
@@ -291,11 +303,13 @@ fun AchievementsSection(primaryColor: Color) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            listOf(
-                "Vocabulary Master" to 0.85f,
-                "Conversation Skills" to 0.75f,
-                "Pronunciation Expert" to 0.65f
-            ).forEach { (title, progressValue) ->
+            // All achievements initially at 0 progress.
+            val achievements = listOf(
+                "Vocabulary Master" to 0.0f,
+                "Conversation Skills" to 0.0f,
+                "Pronunciation Expert" to 0.0f
+            )
+            achievements.forEach { (title, progressValue) ->
                 AchievementItem(
                     title = title,
                     progress = progressValue,

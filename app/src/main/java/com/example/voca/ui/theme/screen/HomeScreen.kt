@@ -1,9 +1,11 @@
 package com.example.voca.ui.theme.screen
 
-import com.example.voca.ui.theme.screen.ProfileScreen
+
+import android.content.Intent
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,19 +17,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.*
-import androidx.compose.foundation.clickable
-import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.voca.activities.ActivityItem
-import com.example.voca.activities.ActivityListActivity
-
-
 import com.example.voca.R
+import com.example.voca.ui.theme.screen.ProfileScreen
+import com.example.voca.activities.PerformanceReportActivity
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -74,7 +74,6 @@ fun HomeScreen(navController: NavController) {
                                 1 -> navController.navigate("profile")
                                 2 -> navController.navigate("camera_activity")
                                 3 -> navController.navigate("activity_list")
-                                // Add other navigation logic if required
                             }
                         },
                         icon = { Icon(imageVector = icons[index], contentDescription = item) },
@@ -111,7 +110,10 @@ fun HomeScreen(navController: NavController) {
                 SpeechTipsSection()
 
                 // Path Activity Section
-                PathActivity(navController)
+                PathActivityCard(navController)
+
+                // NEW: ResultView Card Section (launches ResultViewwActivity)
+                ResultViewCard()
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -122,9 +124,6 @@ fun HomeScreen(navController: NavController) {
     }
 }
 
-/**
- * Displays an image with a border and padding.
- */
 @Composable
 fun DisplayImageSection() {
     Box(
@@ -142,9 +141,6 @@ fun DisplayImageSection() {
     }
 }
 
-/**
- * Displays the Word of the Day banner, which is clickable and navigates to a different screen.
- */
 @Composable
 fun WordOfTheDayBanner(navController: NavController) {
     Card(
@@ -191,9 +187,6 @@ fun WordOfTheDayBanner(navController: NavController) {
     }
 }
 
-/**
- * Displays speech tips in a list format with cards for each tip.
- */
 @Composable
 fun SpeechTipsSection() {
     Column(modifier = Modifier.padding(top = 16.dp)) {
@@ -202,19 +195,16 @@ fun SpeechTipsSection() {
             style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(bottom = 12.dp)
         )
-
         SpeechTipCard(
             icon = Icons.Filled.Mic,
             title = "1. Speak Clearly",
             description = "Ensure your words are articulated properly and not rushed."
         )
-
         SpeechTipCard(
             icon = Icons.Filled.Accessibility,
             title = "2. Practice Breathing",
             description = "Control your speech with regular and proper breathing for better delivery."
         )
-
         SpeechTipCard(
             icon = Icons.Filled.Pause,
             title = "3. Use Pauses Effectively",
@@ -223,13 +213,12 @@ fun SpeechTipsSection() {
     }
 }
 
-/**
- * Displays an individual speech tip in a card format.
- */
 @Composable
 fun SpeechTipCard(icon: ImageVector, title: String, description: String) {
     Card(
-        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
         elevation = 4.dp,
         backgroundColor = Color(0xFFEDE7F6)
     ) {
@@ -260,11 +249,8 @@ fun SpeechTipCard(icon: ImageVector, title: String, description: String) {
     }
 }
 
-/**
- * Displays the Path Activity banner, which is clickable and navigates to a different screen.
- */
 @Composable
-fun PathActivity(navController: NavController) {
+fun PathActivityCard(navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -309,9 +295,57 @@ fun PathActivity(navController: NavController) {
     }
 }
 
-/**
- * Displays the Contact Us section with email, phone, website, and social media details.
- */
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@Composable
+fun ResultViewCard() {
+    val context = LocalContext.current
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(170.dp)
+            .padding(vertical = 20.dp)
+            .clickable {
+                // Launch the new activity called ResultViewwActivity
+                context.startActivity(Intent(context, PerformanceReportActivity::class.java))
+            },
+        elevation = 10.dp,
+        shape = RoundedCornerShape(24.dp),
+        backgroundColor = Color(0xFFD1C4E9)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Assessment,
+                contentDescription = "Result View",
+                tint = Color(0xFF7E57C2),
+                modifier = Modifier.size(70.dp)
+            )
+            Spacer(modifier = Modifier.width(20.dp))
+            Column {
+                Text(
+                    text = "View Results",
+                    style = MaterialTheme.typography.h6.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF6A1B9A)
+                    )
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Tap here to view detailed results.",
+                    style = MaterialTheme.typography.body1.copy(
+                        color = Color.Gray,
+                        fontWeight = FontWeight.Medium
+                    )
+                )
+            }
+        }
+    }
+}
+
 @Composable
 fun ContactUsSection() {
     Card(
@@ -335,8 +369,6 @@ fun ContactUsSection() {
                 ),
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-
-            // Add multiple contact options
             ContactRow(
                 icon = Icons.Filled.Email,
                 title = "Email Us",
@@ -361,9 +393,6 @@ fun ContactUsSection() {
     }
 }
 
-/**
- * Displays a single contact row with an icon, title, and details.
- */
 @Composable
 fun ContactRow(icon: ImageVector, title: String, details: String) {
     Row(
@@ -402,5 +431,6 @@ fun HomeScreenPreview() {
     NavHost(navController = navController, startDestination = "home") {
         composable("home") { HomeScreen(navController = navController) }
         composable("profile") { ProfileScreen() } // ProfileScreen from ProfileScreen.kt
+        // Other routes can be added as needed
     }
 }

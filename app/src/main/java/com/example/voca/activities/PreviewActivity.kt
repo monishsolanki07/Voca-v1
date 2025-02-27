@@ -1,11 +1,10 @@
 package com.example.voca.activities
 
-
-
+import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
+import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,21 +12,19 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Upload
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
-import android.content.ContentValues
-import android.provider.MediaStore
+import com.example.voca.viewmodel.RegisterViewModel
 import java.io.File
-
-import java.io.OutputStream
-
 
 class PreviewActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,9 +43,15 @@ class PreviewActivity : ComponentActivity() {
         }
     }
 }
+
 @Composable
 fun PreviewScreen(videoPath: String, topicName: String) {
     val context = LocalContext.current
+    val viewModel: RegisterViewModel = viewModel()
+
+    // States for upload status
+    var isUploading by remember { mutableStateOf(false) }
+    var uploadMessage by remember { mutableStateOf("") }
 
     // Initialize ExoPlayer
     val player = remember {
@@ -78,7 +81,7 @@ fun PreviewScreen(videoPath: String, topicName: String) {
                 .padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Video Player (3/4th of the screen)
+            // Video Player occupies 75% of the screen height
             AndroidView(
                 factory = { ctx ->
                     PlayerView(ctx).apply {
@@ -88,32 +91,71 @@ fun PreviewScreen(videoPath: String, topicName: String) {
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.75f) // Takes 75% of the screen height
+                    .fillMaxHeight(0.75f)
             )
 
-            Spacer(modifier = Modifier.height(16.dp)) // Space below the player
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Download Button
-            Button(
-                onClick = { downloadVideo(context, videoPath) },
-                modifier = Modifier
-                    .fillMaxWidth(0.5f) // Half of the screen width
-                    .padding(8.dp)
+            // Row with Download and Upload buttons
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Icon(imageVector = Icons.Default.Download, contentDescription = "Download Video")
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Download")
+                // Download Button remains unchanged
+                Button(
+                    onClick = { downloadVideo(context, videoPath) },
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.Download, contentDescription = "Download Video")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "Download")
+                }
+
+                // Upload Button using Firebase only
+                Button(
+                    onClick = {
+                        isUploading = true
+                        val videoUri = Uri.fromFile(File(videoPath))
+                        viewModel.uploadVideoFirebase(topicName, videoUri,
+                            onUploadSuccess = { firebaseUrl ->
+                                // Redirect to ResultActivity with the Firebase download URL
+                                val intent = android.content.Intent(context, ResultActivity::class.java)
+                                intent.putExtra("DOWNLOAD_URL", firebaseUrl)
+                                context.startActivity(intent)
+                                isUploading = false
+                            },
+                            onUploadFailure = { error ->
+                                uploadMessage = "Firebase upload failed: $error"
+                                isUploading = false
+                            }
+                        )
+                    },
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.Upload, contentDescription = "Upload Video")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "Upload")
+                }
+            }
+
+            // Show a progress indicator while uploading
+            if (isUploading) {
+                CircularProgressIndicator(modifier = Modifier.padding(top = 16.dp))
+            }
+            // Show upload status message
+            if (uploadMessage.isNotEmpty()) {
+                Text(text = uploadMessage, modifier = Modifier.padding(16.dp))
             }
         }
     }
 }
 
-// Function to handle video download
+// Function to handle video download (unchanged)
 private fun downloadVideo(context: Context, videoPath: String) {
     val contentValues = ContentValues().apply {
         put(MediaStore.Video.Media.DISPLAY_NAME, File(videoPath).name)
         put(MediaStore.Video.Media.MIME_TYPE, "video/mp4")
-        put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/Voca") // Saves to Movies/Voca folder
+        put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/Voca")
     }
 
     val resolver = context.contentResolver

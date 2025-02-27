@@ -17,26 +17,48 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.voca.model.LessonItem
+
 
 @Composable
-fun PathActivity() {
+fun PathActivity(navController: NavController) {
     var userLevel by remember { mutableStateOf(1) }
     var totalPoints by remember { mutableStateOf(0) }
     var completedLessons by remember { mutableStateOf(setOf<String>()) }
 
+    // List of important English speaking chapters.
     val learningPath = listOf(
-        LessonItem("English Foundations", "basics", 100,
-            "Master fundamental language skills"),
-        LessonItem("Vocabulary Expansion", "vocabulary", 250,
-            "Build a powerful word repertoire"),
-        LessonItem("Conversational Fluency", "conversation", 500,
-            "Develop confident communication skills"),
-        LessonItem("Advanced Grammar", "grammar", 750,
-            "Navigate complex linguistic structures"),
-        LessonItem("Cultural Expressions", "idioms", 1000,
-            "Understand nuanced language context"),
-        LessonItem("Professional Communication", "advanced", 1500,
-            "Elevate your professional language skills")
+        LessonItem(
+            title = "Pronunciation Essentials",
+            id = "pronunciation",
+            points = 100,
+            description = "Learn correct English pronunciation for clear speech."
+        ),
+        LessonItem(
+            title = "Conversational Fluency",
+            id = "conversation",
+            points = 150,
+            description = "Boost your everyday conversation skills."
+        ),
+        LessonItem(
+            title = "Accent Reduction Techniques",
+            id = "accent",
+            points = 200,
+            description = "Neutralize your accent for better understanding."
+        ),
+        LessonItem(
+            title = "Idiomatic Expressions",
+            id = "idioms",
+            points = 250,
+            description = "Master common idioms to sound natural."
+        ),
+        LessonItem(
+            title = "Public Speaking Mastery",
+            id = "public_speaking",
+            points = 300,
+            description = "Enhance your confidence for public presentations."
+        )
     )
 
     Scaffold(
@@ -45,38 +67,36 @@ fun PathActivity() {
                 elevation = 8.dp,
                 color = Color(0xFF1A2C3A)
             ) {
-                Column {
-                    TopAppBar(
-                        title = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            "English Speaking Chapters",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    backgroundColor = Color.Transparent,
+                    elevation = 0.dp,
+                    actions = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(end = 16.dp)
+                        ) {
+                            Icon(
+                                Icons.Filled.Star,
+                                contentDescription = "Points",
+                                tint = Color.Yellow
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                "English Mastery Path",
+                                "$totalPoints",
                                 color = Color.White,
                                 fontWeight = FontWeight.Bold
                             )
-                        },
-                        backgroundColor = Color.Transparent,
-                        elevation = 0.dp,
-                        actions = {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(end = 16.dp)
-                            ) {
-                                Icon(
-                                    Icons.Filled.Star,
-                                    contentDescription = "Points",
-                                    tint = Color.Yellow
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    "$totalPoints",
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                            LevelBadge(userLevel)
                         }
-                    )
-                }
+                        LevelBadge(userLevel)
+                    }
+                )
             }
         }
     ) { padding ->
@@ -102,11 +122,14 @@ fun PathActivity() {
                         isCompleted = lesson.id in completedLessons,
                         isUnlocked = index == 0 || learningPath[index - 1].id in completedLessons,
                         onLessonComplete = {
+                            // Update progress and achievements.
                             completedLessons = completedLessons + lesson.id
                             totalPoints += lesson.points
                             if (totalPoints >= userLevel * 1000) {
                                 userLevel++
                             }
+                            // Redirect to the lesson detail screen.
+                            navController.navigate("lessonDetail/${lesson.id}")
                         }
                     )
                 }
@@ -206,9 +229,9 @@ fun ProfessionalLessonCard(
             ) {
                 Text(
                     text = when {
-                        isCompleted -> "Mastered"
+                        isCompleted -> "Completed"
                         !isUnlocked -> "Locked"
-                        else -> "Start Lesson"
+                        else -> "Start Chapter"
                     },
                     color = Color.White,
                     fontWeight = FontWeight.Bold
@@ -218,9 +241,4 @@ fun ProfessionalLessonCard(
     }
 }
 
-data class LessonItem(
-    val title: String,
-    val id: String,
-    val points: Int,
-    val description: String
-)
+

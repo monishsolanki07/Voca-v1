@@ -3,6 +3,7 @@ package com.example.voca.ui.theme.screen
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import android.content.Context
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
@@ -42,7 +43,6 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavController) {
     val adminPassword = "admin07"
 
     // Generate key pair and exchange public key immediately.
-    // This public key exchange is your server side call—untouched and intact.
     LaunchedEffect(Unit) {
         Log.d("RegisterScreen", "Generating key pair...")
         generateKeyPair(alias)
@@ -55,7 +55,7 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavController) {
                     Log.d("RegisterScreen", "Public key exchange successful.")
                 },
                 onError = { error ->
-                    Toast.makeText(context, "Public key exchange failed: $error", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(context, "Public key exchange failed: $error", Toast.LENGTH_SHORT).show()
                 })
         } else {
             Log.e("RegisterScreen", "Failed to generate key pair.")
@@ -132,6 +132,12 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavController) {
                 onClick = {
                     // Admin bypass for demonstration purposes.
                     if (username == adminUsername && password == adminPassword) {
+                        // Store username in SharedPreferences
+                        val sharedPref = context.getSharedPreferences("user_data", Context.MODE_PRIVATE)
+                        with(sharedPref.edit()) {
+                            putString("username", username)
+                            apply()
+                        }
                         navController.navigate("home")
                         return@Button
                     }
@@ -156,7 +162,15 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavController) {
                             email = email,
                             password = password,
                             request = request,
-                            onSuccess = { navController.navigate("home") },
+                            onSuccess = {
+                                // Store username in SharedPreferences
+                                val sharedPref = context.getSharedPreferences("user_data", Context.MODE_PRIVATE)
+                                with(sharedPref.edit()) {
+                                    putString("username", username)
+                                    apply()
+                                }
+                                navController.navigate("home")
+                            },
                             onError = { error ->
                                 Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
                             }
