@@ -22,6 +22,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.coroutines.resume
+import com.example.voca.utils.getCurrentTimestamp
 
 class RegisterViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -38,7 +39,7 @@ class RegisterViewModel : ViewModel() {
 
         // Update the base URL with your server's public endpoint if needed.
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://your-public-api-endpoint/") // Server-side endpoint
+            .baseUrl("http://10.0.2.2:8000/") // Server-side endpoint
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -48,18 +49,21 @@ class RegisterViewModel : ViewModel() {
     // --- Server-Side Functions (For Public Key Exchange, Registration, etc.) ---
 
     // Exchange public key with the server.
-    fun exchangePublicKey(publicKey: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
+    fun exchangePublicKey(publicKey: String, userID: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        val timestamp = getCurrentTimestamp()
         Log.d("RegisterViewModel", "Sending public key to the server: $publicKey")
-        val request = PublicKeyExchangeRequest(publicKey)
+        val request = PublicKeyExchangeRequest(timestamp, publicKey, userID)
         apiService.exchangePublicKey(request).enqueue(object : Callback<PublicKeyExchangeResponse> {
             override fun onResponse(call: Call<PublicKeyExchangeResponse>, response: Response<PublicKeyExchangeResponse>) {
                 if (response.isSuccessful) {
-                    Log.d("RegisterViewModel", "Public key exchange successful: ${response.body()?.status}")
+                    Log.d("RegisterViewModel", "Public key exchange successful: ${response.body()?.pubkey}")
                     onSuccess()
                 } else {
-                    Log.e("RegisterViewModel", "Public key exchange failed: ${response.message()}")
-                    onError("Public key exchange failed: ${response.message()}")
+                    val errorBody = response.errorBody()?.string() ?: response.message()
+                    Log.e("RegisterViewModel", "Public key exchange failed: $errorBody")
+                    onError("Public key exchange failed: $errorBody")
                 }
+
             }
             override fun onFailure(call: Call<PublicKeyExchangeResponse>, t: Throwable) {
                 Log.e("RegisterViewModel", "Public key exchange failed: ${t.message}")

@@ -20,7 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.voca.network.RegisterRequest
 import com.example.voca.network.User
-import com.example.voca.utils.encodePublicKeyToBase64
+import com.example.voca.utils.encodePublicKeyToPEM
+import com.example.voca.utils.encryptMessage
 import com.example.voca.utils.getPublicKey
 import com.example.voca.utils.generateKeyPair
 import com.example.voca.viewmodel.RegisterViewModel
@@ -48,19 +49,30 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavController) {
         generateKeyPair(alias)
         val key = getPublicKey(alias)
         if (key != null) {
-            publicKey = encodePublicKeyToBase64(key)
-            Log.d("RegisterScreen", "Key pair generated. Public key: $publicKey")
-            viewModel.exchangePublicKey(publicKey,
+            // Encode the public key to a Base64 string (to send to your backend)
+            publicKey = encodePublicKeyToPEM(key)
+
+            Log.d("RegisterScreen", "Received Public key: $publicKey")
+
+            // Example: Encrypt a sample message using the public key
+            val sampleMessage = "Your sensitive data"
+            val encryptedMessage = encryptMessage(sampleMessage, key)
+            Log.d("RegisterScreen", "Encrypted message: $encryptedMessage")
+
+            // Exchange the public key with your backend.
+            viewModel.exchangePublicKey(publicKey, "your-user-id",
                 onSuccess = {
                     Log.d("RegisterScreen", "Public key exchange successful.")
                 },
                 onError = { error ->
-//                    Toast.makeText(context, "Public key exchange failed: $error", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Public key exchange failed: $error", Toast.LENGTH_SHORT).show()
                 })
         } else {
             Log.e("RegisterScreen", "Failed to generate key pair.")
         }
     }
+
+
 
     // UI layout remains the same—nothing removed, especially your server side call.
     Column(

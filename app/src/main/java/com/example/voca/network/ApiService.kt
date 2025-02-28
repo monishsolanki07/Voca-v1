@@ -12,8 +12,11 @@ data class RegisterRequest(
 
 // Request data structure for exchanging the public key
 data class PublicKeyExchangeRequest(
-    val publicKey: String
+    val timestamp: String,  // Must be in ISO 8601 format
+    val key: String,        // Base64 Encoded Public Key
+    val userID: String      // Username
 )
+
 
 // User details structure
 data class User(
@@ -33,9 +36,10 @@ data class RegisterResponse(
 
 // Response data structure for public key exchange
 data class PublicKeyExchangeResponse(
-    val status: String,
-    val message: String
+    val message: String,
+    val pubkey: String
 )
+
 
 // New data classes for video upload via firewall
 data class VideoUploadRequest(
@@ -52,8 +56,9 @@ interface ApiService {
     @POST("register")
     fun registerUser(@Body request: RegisterRequest): Call<RegisterResponse>
 
-    @POST("exchange-public-key")
+    @POST("api/key")
     fun exchangePublicKey(@Body request: PublicKeyExchangeRequest): Call<PublicKeyExchangeResponse>
+
 
     // New endpoint for sending the video URL to the firewall
     @POST("uploadVideo")
