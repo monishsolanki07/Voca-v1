@@ -183,6 +183,15 @@ dependencies {
     implementation ("com.google.firebase:firebase-auth:22.3.1")
     implementation ("com.google.firebase:firebase-firestore:24.10.1")
 
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+
+
+    implementation("androidx.compose.ui:ui-text:1.6.0")
+    implementation("androidx.compose.material:material:1.6.0")
+    implementation("androidx.compose.ui:ui:1.6.0")
+
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
 
 
 

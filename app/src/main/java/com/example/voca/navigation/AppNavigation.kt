@@ -20,6 +20,7 @@ import com.example.voca.ui.theme.screen.LessonDetailScreen
 import com.example.voca.ui.theme.screen.PathActivity
 import com.example.voca.ui.theme.screen.ProfileScreen
 import com.example.voca.ui.theme.screen.WordOfTheDayScreen
+import com.example.voca.ui.theme.screen.ReportScreen
 import com.example.voca.ui.theme.screen.SignInScreen
 import com.google.firebase.auth.FirebaseAuth
 
@@ -44,6 +45,9 @@ fun AppNavigation(viewModel: RegisterViewModel) {
         }
         composable("word_of_the_day") {
             WordOfTheDayScreen()
+        }
+        composable("result") {
+            ReportScreen()
         }
         // For "path_activity", we now call the function defined in HomeScreen.
         // Ensure that HomeScreen.kt has the PathActivity(navController) function that does the redirection.
