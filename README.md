@@ -10,7 +10,8 @@
 VOCA is a modern Android application that helps users improve their **communication and soft skills** through **multimodal AI analysis**.  
 The app records a video response, uploads it to the cloud, triggers backend ML processing, and returns a detailed performance report.
 
-Link : https://voca-rouge.vercel.app/
+- Link : https://voca-rouge.vercel.app/
+- Master Repo : https://github.com/Kvothe045/Voca_Electrothon
 ---
 
 ## 📚 Table of Contents
